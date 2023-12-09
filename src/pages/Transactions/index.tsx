@@ -6,8 +6,15 @@ import {
   TransactionsTable,
   PriceHighLight,
 } from "./styles";
+import { TransactionContext } from "../../contexts/TransactionsContext";
+import { dateFormatter, priceFormatter } from "../../utils/formatter";
+import { useContextSelector } from "use-context-selector";
 
 export const Transactions = () => {
+  const transactions = useContextSelector(TransactionContext, (context) => {
+    return context.transactions;
+  });
+
   return (
     <div>
       <Header />
@@ -18,22 +25,22 @@ export const Transactions = () => {
 
         <TransactionsTable>
           <tbody>
-            <tr>
-              <td width="40%">Desenvolvimento de site</td>
-              <td>
-                <PriceHighLight variant="income">R$ 12.000,00</PriceHighLight>
-              </td>
-              <td>Venda</td>
-              <td>13/04/2022</td>
-            </tr>
-            <tr>
-              <td width="40%">ifood</td>
-              <td>
-                <PriceHighLight variant="outcome">- R$ 59,00</PriceHighLight>
-              </td>
-              <td>Venda</td>
-              <td>13/04/2022</td>
-            </tr>
+            {transactions &&
+              transactions.map((elem) => {
+                return (
+                  <tr key={elem.id}>
+                    <td width="40%">{elem.description}</td>
+                    <td>
+                      <PriceHighLight variant={elem.type}>
+                        {elem.type === "outcome" && "- "}
+                        {priceFormatter.format(elem.price)}
+                      </PriceHighLight>
+                    </td>
+                    <td>{elem.category}</td>
+                    <td>{dateFormatter.format(new Date(elem.createdAt))}</td>
+                  </tr>
+                );
+              })}
           </tbody>
         </TransactionsTable>
       </TransactionsContainer>
